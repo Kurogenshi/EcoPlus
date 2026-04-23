@@ -20,6 +20,10 @@ public class BinPlacementManager : MonoBehaviour
     [Header("Zone de jeu")]
     [SerializeField] private GameObject playAreaIndicatorPrefab;
 
+    [Header("Shadow receiver")]
+    [SerializeField] private Material shadowReceiverMaterial;
+    [SerializeField] private float shadowPlaneSize = 4f;
+
     private readonly List<ARRaycastHit> hits = new();
     private readonly List<GameObject> placedBins = new();
     private int currentBinIndex = 0;
@@ -95,6 +99,18 @@ public class BinPlacementManager : MonoBehaviour
         planeManager.enabled = false;
         foreach (var plane in planeManager.trackables)
             plane.gameObject.SetActive(false);
+
+        if (shadowReceiverMaterial != null && selectedPlane != null)
+        {
+            GameObject shadowPlane = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            shadowPlane.name = "AR_ShadowReceiver";
+            shadowPlane.transform.position = selectedPlane.center + Vector3.up * 0.001f;
+            shadowPlane.transform.rotation = Quaternion.Euler(90, 0, 0);
+            shadowPlane.transform.localScale = Vector3.one * shadowPlaneSize;
+
+            Destroy(shadowPlane.GetComponent<Collider>());
+            shadowPlane.GetComponent<MeshRenderer>().material = shadowReceiverMaterial;
+        }
 
         if (playAreaIndicatorPrefab != null && selectedPlane != null)
         {
